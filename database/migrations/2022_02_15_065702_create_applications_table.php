@@ -12,13 +12,22 @@ return new class extends Migration {
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
             $table->string('status');
-            $table->foreignIdFor(Customer::class)->constrained()->index();
-            $table->foreignIdFor(Plan::class)->constrained()->index();
+
+            // fix foreign keys with explicit names "Duplicate key name '1'" - mysql issue
+            $table->foreignIdFor(Customer::class)
+                ->constrained()
+                ->index()
+                ->name('applications_customer_id_foreign');
+
+            $table->foreignIdFor(Plan::class)
+                ->constrained()
+                ->index()
+                ->name('applications_plan_id_foreign');
+
             $table->string('address_1');
             $table->string('address_2')->nullable();
             $table->string('city');
@@ -34,8 +43,7 @@ return new class extends Migration {
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('applications');
     }
 };
